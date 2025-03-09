@@ -18,7 +18,7 @@ import java.util.List;
 public class salaryWorked {
     
     /*
-    SYNTAX IS NOT YET FINALZ FOR CSV AS A DATABASED
+    SYNTAX IS NOT YET FINAL FOR CSV AS A DATABASED
     */
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
