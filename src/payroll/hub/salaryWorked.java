@@ -7,6 +7,7 @@ package payroll.hub;
 /**
  *
  * @author rowel
+ * THIS IS NICHIE TOLENTINO
  */
 import java.time.LocalTime;
 import java.time.Duration;
