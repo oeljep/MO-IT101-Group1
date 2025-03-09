@@ -58,7 +58,39 @@ public class hoursWorked {
     public static void main(String[] args) {
         
 //Running employeeInfo CLASS
+        String inputCSV = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\emloyeetest.csv";
+        String line;
+        String delimiter = ",";
 
+        System.out.println("--- Employee Info ---");
+        String format = "%-15s %-15s \n";
+        System.out.printf(format, "Employee #", "Name");
+        System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(inputCSV))) {
+            // Skip the header line
+            br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                String[] input = line.split(delimiter);
+
+//                if (input.length != 9) {
+//                    System.out.println("Invalid record: " + line);
+//                    continue;
+//                }
+
+                try {
+                    int idEmployee = Integer.parseInt(input[0].trim());
+                    String name = input[1].trim();
+                    
+                    System.out.printf(format, idEmployee, name);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid number format in record: " + line);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading the file: " + e.getMessage());
+        }
 //hoursWorked CLASS starts right here
         //Initializing biMonthly cutOffs
         int[] cutOffDays = {15,30}; //flexible cut off day
@@ -68,37 +100,45 @@ public class hoursWorked {
         LocalDate lastCutoff = today.withDayOfMonth(cutOffDays[1]);
         
         //Insert CSV file
-        String inputCSV = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\attendancetest.csv";
+        String inputCSV1 = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\attendancetest.csv";
         String line1;
         //Delimiter Identifier
         String delimiter1 = ",";
+        
+        //Initialized formatters
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         
         // Stores {hours, minutes} for clock-in and clock outs
         List<int[]> actualClockIn = new ArrayList<>();  
         List<int[]> clockOut = new ArrayList<>();
         
-        try (BufferedReader br = new BufferedReader(new FileReader(inputCSV))) {
+        LocalTime scheduledClockIn = LocalTime.of(8, 0);
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(inputCSV1))) {
             while ((line1 = br.readLine()) != null) {
                 //Spilt line into individual values
                 String[] input = line1.split(delimiter1);
                 
                 //Parse different data types
                 int idEmployee = Integer.parseInt(input[0].trim());
-                String date = input[1].trim();
-                String clockingIn = input[2].trim();
-                String clockingOut = input[3].trim();
+                LocalDate date = LocalDate.parse(input[1].trim(), dateFormatter);
+                LocalTime actualClockInTime = LocalTime.parse(input[2].trim(), timeFormatter);
+                LocalTime clockOutTime = LocalTime.parse(input[3].trim(), timeFormatter);
         
                 // Split and store clock-in and clock-out times
-                actualClockIn.add(splitTime(clockingIn));
-                clockOut.add(splitTime(clockingOut));
+                //actualClockIn.add(splitTime(clockingIn));
+                //clockOut.add(splitTime(clockingOut));
+                
+                // Create EmployeeShift instance
+                hoursWorked shift = new hoursWorked(scheduledClockIn, actualClockIn, clockOut);
+                
             }
         } catch (IOException e) {
             System.out.println("Error reading the file: " + e.getMessage()); 
         } catch (NumberFormatException e) {
             System.out.println("Invalid data format: " + e.getMessage());
         }   
-        
-        LocalTime scheduledClockIn = LocalTime.of(8, 0);
                 
         // getting time in and time outs
         for (int i = 0; i < actualClockIn.size(); i++) {
@@ -108,7 +148,7 @@ public class hoursWorked {
             //Test print
             System.out.println(in[0] + ":" + in[1] + " | " + out[0] + ":" + out[1] + "");
         }
-        
+        System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------");
         /**
          *CURRENT STATUS:
          *initialized the clock in and clock out

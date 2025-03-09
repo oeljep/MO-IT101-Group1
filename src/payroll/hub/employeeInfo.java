@@ -15,37 +15,39 @@ import java.io.IOException;
 public class employeeInfo {
     
     public static void main(String[] args) {
-        //Insert CSV file
-        String inputCSV1 = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\emloyeetest.csv"; 
+        String inputCSV = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\emloyeetest.csv";
         String line;
-        //Delimiter Identifier
-        String delimiter = ","; 
-        
-        //Header
+        String delimiter = ",";
+
         System.out.println("--- Employee Info ---");
-        
-        String format = "%-15s %-15s %-15s %-15s %-15s %-15s %-15s\n";
-        System.out.printf(format, "Employee #", "Name", "Hours Worked", "Gross Pay", "SSS", "PhilHealth", "Pag-Ibig", "Withholding Tax", "Net Pay");
+        String format = "%-15s %-15s \n";
+        System.out.printf(format, "Employee #", "Name");
         System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------");
 
-        try (BufferedReader br = new BufferedReader(new FileReader(inputCSV1))) {
-            while ((line = br.readLine()) != null) {
-                //Spilt line into individual values
-                String[] input = line.split(delimiter);
-                
-                //Parse different data types
-                int idEmployee = Integer.parseInt(input[0].trim());
-                String name = input[1].trim();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputCSV))) {
+            // Skip the header line
+            br.readLine();
 
-                //Print parsed data                
-                String formattedLine = String.format(format, idEmployee, name);
-                System.out.println(formattedLine);
+            while ((line = br.readLine()) != null) {
+                String[] input = line.split(delimiter);
+
+//                if (input.length != 9) {
+//                    System.out.println("Invalid record: " + line);
+//                    continue;
+//                }
+
+                try {
+                    int idEmployee = Integer.parseInt(input[0].trim());
+                    String name = input[1].trim();
+                    
+                    System.out.printf(format, idEmployee, name);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid number format in record: " + line);
+                }
             }
         } catch (IOException e) {
-            System.out.println("Error reading the file: " + e.getMessage()); 
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid data format: " + e.getMessage());
-        }   
+            System.out.println("Error reading the file: " + e.getMessage());
+        }
         System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------");
     }
 }
