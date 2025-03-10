@@ -10,9 +10,18 @@ Payroll Hub is a simple payroll system that:
 This project is implemented in **Java**, using `BufferedReader` for input processing.  
 
 ---
+
 For
 ## 📊 **Sample Output**  
 please run SAMPLE.java
+
+## ⚙️ **Features**  
+✅ Calculates worked hours per cut-off (for allowances)  
+✅ Computes gross pay based on worked hours  
+✅ Applies government deductions based on a given matrix  
+✅ Determines **net pay** (after deductions)  
+
+---
 
 ## 📂 **File Handling**  
 The program reads input from:  
