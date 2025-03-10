@@ -1,29 +1,31 @@
-PAYROLL HUB
-This project is a simple payroll system that calculates work hours, applies a grace period, calculates government deduction, and net pay. It is implemented in Java using BufferedReader for input processing. The sample output is shown below:
+# **PAYROLL HUB**
 
---- Employee Database with Weekly Salary (Clock-In/Out, Grace Period, OT) ---
-Employee # Name                      Position                       Clock-In        Clock-Out       Regular Hours   Overtime Hours  Weekly Salary  
------------------------------------------------------------------------------------------------------------------------------------------
-10001      Manuel III Garcia         Chief Executive Officer        7:08 AM         6:57 PM         11.82           0.00            590.83         
-10002      Antonio Jr. Lim           Chief Operating Officer        7:02 AM         3:24 PM         8.37            0.00            502.00         
-10003      Bianca Sofia Aquino       Chief Finance Officer          7:01 AM         3:54 PM         8.88            0.00            666.25         
------------------------------------------------------------------------------------------------------------------------------------------
+## 📌 Project Overview  
+Payroll Hub is a simple payroll system that:  
+- Calculates work hours and applies a grace period  
+- Computes government deductions  
+- Determines net pay based on worked hours  
+- Reads employee data from CSV files for processing  
 
-Program that:
-- calculates the worked hours per cut-off (specifically to apply allowances)
-- calculates gross pay based on the worked hours
-- calculates the government deduction based on the provided matrix
-- calculates netpay (or after government deduction)
+This project is implemented in **Java**, using `BufferedReader` for input processing.  
 
-Reads input from the following file:
-- employeetest.csv
-- attendancetest.csv
+---
+For
+## 📊 **Sample Output**  
+please run SAMPLE.java
 
-Parsing the files and storing them in the following array list:
--   actualClockin
--   clockOut
+## 📂 **File Handling**  
+The program reads input from:  
+📌 `employeetest.csv` (Employee details)  
+📌 `attendancetest.csv` (Attendance records)  
 
-File Structure:
+These files are parsed and stored in the following **ArrayLists**:  
+📌 `actualClockin`  
+📌 `clockOut`  
+
+---
+
+## 🏗 **File Structure**  
 
 /PayrollHub
 ├── src/
@@ -38,23 +40,32 @@ File Structure:
 ├── .gitignore
 └── LICENSE
 
-STATUS: In progress
+## 🚧 **Project Status**  
+🔧 **In Progress**  
 
-THINGS TO IMPROVE:
-- Syntax error is evident across files
-- Improve file structuring
-- 
+### 🔍 **Things to Improve**  
+- Fix syntax errors across files  
+- Improve file structuring  
 
-CONTRIBUTORS:
-Rowel Jepsani	              - oeljep
-Juan Paolo Dente	          - Betalogs
-Nichie Tolentino            -	Archie0405
-Danielle Sophia Pasion      - DanielleSophiaFP
-Mico Angelo Uy	            - ocims7
-Maila Yruma	                - maila02
-Ericson Renion	
-Jose Maximo E. Ronquillo	  - joma001
-James Angeles	              - Jamesangeles-byte
-Edward Joseph Basilonia	    - EJB0624
+---
 
+## 👥 **Contributors**  
+| Name | GitHub Handle |
+|------|--------------|
+| Rowel Jepsani | [@oeljep](https://github.com/oeljep) |
+| Juan Paolo Dente | [@Betalogs](https://github.com/Betalogs) |
+| Nichie Tolentino | [@Archie0405](https://github.com/Archie0405) |
+| Danielle Sophia Pasion | [@DanielleSophiaFP](https://github.com/DanielleSophiaFP) |
+| Mico Angelo Uy | [@ocims7](https://github.com/ocims7) |
+| Maila Yruma | [@maila02](https://github.com/maila02) |
+| Ericson Renion | - |
+| Jose Maximo E. Ronquillo | [@joma001](https://github.com/joma001) |
+| James Angeles | [@Jamesangeles-byte](https://github.com/Jamesangeles-byte) |
+| Edward Joseph Basilonia | [@EJB0624](https://github.com/EJB0624) |
 
+---
+
+🎯 **How to Use:**  
+1️⃣ Clone this repository  
+```sh
+git clone https://github.com/your-repo/payroll-hub.git
