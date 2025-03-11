@@ -1,0 +1,3 @@
+10001,Garcia,Manuel III,Regular,Chief Executive Officer,50
+10002,Lim,Antonio Jr.,Regular,Chief Operating Officer,60
+10003,Aquino,Bianca Sofia,Regular,Chief Finance Officer,75
