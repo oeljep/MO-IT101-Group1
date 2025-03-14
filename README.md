@@ -57,28 +57,27 @@ Enter end date (yyyy-MM-dd): 2024-07-15
 The program reads input from:  
 📌 `employeetest.csv` (Employee details)  
 📌 `attendancetest.csv` (Attendance records)  
-
-These files are parsed and stored in the following **ArrayLists**:  
-📌 `actualClockin`  
-📌 `clockOut`  
+📌 `employeeinfo&timekeeping.csv` (Employee Details & Attendance records)  
 
 ---
 
 ## 🏗 **File Structure**  
-
+```sh
 /PayrollHub
 ├── src/
 │   ├── SAMPLE.java
+│   ├── SalaryComputation.java
 │   ├── attendancetest.csv
 │   ├── employeetest.csv
 │   ├── employeeInfo.java
+│   ├── employeeinfo&timekeeping.java
 │   ├── governmentDeductions.java
 │   ├── hoursWorked.java
 │   └── salaryWorked.java
 ├── README.md
 ├── .gitignore
 └── LICENSE
-
+```
 ## 🚧 **Project Status**  
 🔧 **In Progress**  
 
@@ -112,5 +111,5 @@ These files are parsed and stored in the following **ArrayLists**:
 1️⃣ Clone this repository  
 ```sh
 git clone https://github.com/your-repo/payroll-hub.git
-
+```
 2️⃣ Run **SalaryComputation.java**
