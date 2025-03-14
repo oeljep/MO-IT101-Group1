@@ -34,10 +34,10 @@ Enter end date (yyyy-MM-dd): 2024-07-15
 |                                         |
 | GROSS PAY             50,801.42         |
 -------------------------------------------
-| Social Security System:  900.00	        |
-| Philhealth:	        		 450.00         |		
-| Pag-Ibig:			           100.00         |		
-| Withholding Tax			       0.00         |		
+| Social Security System:  900.00	    |
+| Philhealth:	        450.00         |		
+| Pag-Ibig:			     100.00         |		
+| Withholding Tax			  0.00         |		
 |                                         |
 | TOTAL DEDUCTIONS			   1,450.00       |		
 -------------------------------------------
