@@ -156,6 +156,7 @@ public class hoursWorked {
          *TO DO:
          *calculation of duration per day
          * *introduce the grace period
+         * ISSUE WITH DATA TYPE
          *identify the employee number
          * *then identify the dates
          * *

@@ -7,13 +7,43 @@ Payroll Hub is a simple payroll system that:
 - Determines net pay based on worked hours  
 - Reads employee data from CSV files for processing  
 
-This project is implemented in **Java**, using `BufferedReader` for input processing.  
+This project is implemented in **Java**, using `BufferedReader` for input processing. 
 
 ---
 
 For
 ## 📊 **Sample Output**  
-please run SAMPLE.java
+
+```java
+Enter Employee ID: 10001
+Enter start date (yyyy-MM-dd): 2024-07-01
+Enter end date (yyyy-MM-dd): 2024-07-15
+-------------------------------------------
+|           PAYROLL DETAILS               |
+-------------------------------------------
+| Employee Info                           |
+| ID: 10001                               |
+| Name: Manuel III Garcia                 |
+| Hourly Rate: 535.71                     |
+-------------------------------------------
+| Cut-off Period: 2024-07-01 - 2024-07-15 |
+| Total Worked Hours:    86.43 hours      |
+| Rice Subsidy:          1,500.00         |
+| Phone Allowance        2,000.00         |
+| Clothing Allowance     1,000.00         |
+|                                         |
+| GROSS PAY             50,801.42         |
+-------------------------------------------
+| Social Security System:  900.00	   |
+| Philhealth:	        450.00      |		
+| Pag-Ibig:			     100.00     |		
+| Withholding Tax			  0.00      |		
+|                                         |
+| TOTAL DEDUCTIONS			   1,450.00       |		
+-------------------------------------------
+| NET PAY                 49,351.42       |
+-------------------------------------------
+```
 
 ## ⚙️ **Features**  
 ✅ Calculates worked hours per cut-off (for allowances)  
@@ -27,34 +57,36 @@ please run SAMPLE.java
 The program reads input from:  
 📌 `employeetest.csv` (Employee details)  
 📌 `attendancetest.csv` (Attendance records)  
-
-These files are parsed and stored in the following **ArrayLists**:  
-📌 `actualClockin`  
-📌 `clockOut`  
+📌 `employeeinfo&timekeeping.csv` (Employee Details & Attendance records)  
 
 ---
 
 ## 🏗 **File Structure**  
-
+```sh
 /PayrollHub
 ├── src/
 │   ├── SAMPLE.java
+│   ├── SalaryComputation.java
 │   ├── attendancetest.csv
 │   ├── employeetest.csv
 │   ├── employeeInfo.java
+│   ├── employeeinfo&timekeeping.java
 │   ├── governmentDeductions.java
 │   ├── hoursWorked.java
 │   └── salaryWorked.java
 ├── README.md
 ├── .gitignore
 └── LICENSE
-
+```
 ## 🚧 **Project Status**  
 🔧 **In Progress**  
 
 ### 🔍 **Things to Improve**  
 - Fix syntax errors across files  
-- Improve file structuring  
+- User doesn't have any idea what are the available cut off periods.
+- Hourly rate is absolute
+- Allowances are not yet introduce
+- Government deduction are not yet introduce
 
 ---
 
@@ -75,6 +107,9 @@ These files are parsed and stored in the following **ArrayLists**:
 ---
 
 🎯 **How to Use:**  
+
 1️⃣ Clone this repository  
 ```sh
 git clone https://github.com/your-repo/payroll-hub.git
+```
+2️⃣ Run **SalaryComputation.java**
