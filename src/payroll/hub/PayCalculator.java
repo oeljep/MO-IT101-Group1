@@ -196,7 +196,7 @@ public class PayCalculator {
             
             // Display payroll details
             System.out.println("\n----------------------------------------");
-            System.out.println("|       MMOTOR PH PAYROLL DETAILS        |");
+            System.out.println("|       MOTOR PH PAYROLL DETAILS       |");
             System.out.println("----------------------------------------");
             System.out.printf("| Employee ID: %-23s |\n", employeeID);
             System.out.printf("| Cut-off Period: %-10s to %-10s \n", startDateInput, endDateInput);
@@ -212,11 +212,11 @@ public class PayCalculator {
             System.out.printf("| SSS Deduction: %-21.2f |\n", sssDeduction);
             System.out.printf("| PhilHealth Deduction: %-14.2f |\n", philhealthDeduction);
             System.out.printf("| Pag-IBIG Deduction: %-16.2f |\n", pagibigDeduction);
-            System.out.printf("| Withholding Tax: %-18.2f |\n", withholdingTax);
+            System.out.printf("| Withholding Tax: %-19.2f |\n", withholdingTax);
             System.out.println("----------------------------------------");
-            System.out.printf("| TOTAL DEDUCTIONS: %-17.2f |\n", totalDeductions);
+            System.out.printf("| TOTAL DEDUCTIONS: %-18.2f |\n", totalDeductions);
             System.out.println("----------------------------------------");
-            System.out.printf("| NET PAY: %-26.2f |\n", netPay);
+            System.out.printf("| NET PAY: %-27.2f |\n", netPay);
             System.out.println("----------------------------------------");
         } else {
             System.out.println("Employee ID not found.");
