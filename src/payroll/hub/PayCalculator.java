@@ -196,7 +196,7 @@ public class PayCalculator {
             
             // Display payroll details
             System.out.println("\n----------------------------------------");
-            System.out.println("|       MMOTOR PH PAYROLL DETAILS        ");
+            System.out.println("|       MMOTOR PH PAYROLL DETAILS        |");
             System.out.println("----------------------------------------");
             System.out.printf("| Employee ID: %-23s |\n", employeeID);
             System.out.printf("| Cut-off Period: %-10s to %-10s \n", startDateInput, endDateInput);
