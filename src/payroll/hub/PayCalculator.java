@@ -181,32 +181,32 @@ public class PayCalculator {
             double totalAllowances = riceSubsidy + phoneAllowance + clothingAllowance;
             double grossPay = regularPay + overtimePay + totalAllowances;
 
-            // Calculate government deductions based on cutoff type
-            double sssDeduction = isFirstCutoff ? calculateSSS(grossPay) : 0.0; // Calculate government deductions based on cutoff type
-            double philhealthDeduction = isFirstCutoff ? calculatePhilhealth(grossPay) : 0.0; // Only deduct PhilHealth in first cutoff
-            double pagibigDeduction = isFirstCutoff ? calculatePagibig(grossPay) : 0.0; // Only deduct Pag-IBIG in first cutoff
+            // Calculates government deductions based on cut-off type
+            double sssDeduction = isFirstCutoff ? calculateSSS(grossPay) : 0.0; // Only deducts SSS in 1st cut-off
+            double philhealthDeduction = isFirstCutoff ? calculatePhilhealth(grossPay) : 0.0; // Only deducts PhilHealth in 1st cut-off
+            double pagibigDeduction = isFirstCutoff ? calculatePagibig(grossPay) : 0.0; // Only deducts Pag-IBIG in 1st cut-off
 
-            // Calculate taxable income (gross pay minus non-taxable deductions)
+            // Calculates taxable income (gross pay minus non-taxable deductions)
             double taxableIncome = grossPay - (sssDeduction + philhealthDeduction + pagibigDeduction);
 
-            // Calculate full withholding tax for the month
+            // Calculates full withholding tax for the month
             double fullWithholdingTax = calculateWithholdingTax(taxableIncome);
             
-            // Divides the total withholding tax equally between both cutoff periods
+            // Divides the total withholding tax equally between both cut-off periods
             double withholdingTax = fullWithholdingTax / 2;
             
             // Prepare display values
-            String sssDisplay = isFirstCutoff ? String.format("%.2f", sssDeduction) : "-"; // Shows "-" for non-applicable deductions in the 2nd cutoff
+            String sssDisplay = isFirstCutoff ? String.format("%.2f", sssDeduction) : "-"; // Shows "-" for non-applicable deductions in the 2nd cut-off
             String philhealthDisplay = isFirstCutoff ? String.format("%.2f", philhealthDeduction) : "-";
             String pagibigDisplay = isFirstCutoff ? String.format("%.2f", pagibigDeduction) : "-";
             
-            // Calculate final deductions and net pay
+            // Calculates final deductions and net pay
             double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
             double netPay = grossPay - totalDeductions;
             
             // Display payroll details
             System.out.println("\n----------------------------------------");
-            System.out.printf("| MOTOR PH PAYROLL DETAILS - %s Cutoff |\n", isFirstCutoff ? "1st" : "2nd"); // Shows cutoff type in header
+            System.out.printf("| MOTOR PH PAYROLL DETAILS - %s Cutoff |\n", isFirstCutoff ? "1st" : "2nd"); // Shows cut-off type in header
             System.out.println("----------------------------------------");
             System.out.printf("| Employee ID: %-23s |\n", employeeID);
             System.out.printf("| Cut-off Period: %-10s to %-10s \n", startDateInput, endDateInput);
