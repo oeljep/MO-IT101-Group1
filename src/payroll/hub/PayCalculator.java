@@ -6,22 +6,25 @@ package payroll.hub;
 
 /**
  *
- * @author rowel
+ * @author Jomax
  */
 
 import java.io.*;
-import java.nio.file.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.nio.file.*;
+import java.nio.file.StandardOpenOption;
 
 public class PayCalculator {
 
-    // Fields for employee allowances and hourly rate
+    // Fields for employee allowances, hourly rate, name, and position
     private int riceSubsidy;
     private int phoneAllowance;
     private int clothingAllowance;
     private double hourlyRate;
+    private String name; // Added field for employee name
+    private String position; // Added field for employee position
 
     // Constructor for PayCalculator
     public PayCalculator(int riceSubsidy, int phoneAllowance, int clothingAllowance, double hourlyRate) {
@@ -31,16 +34,31 @@ public class PayCalculator {
         this.hourlyRate = hourlyRate;
     }
 
-    // File path for hourly rates and allowances
-    private static final String EMPLOYEE_INFO = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
-    private static final Map<String, PayCalculator> employeeMapRates = new HashMap<>();
+    // Getters and setters for new fields
+    public String getName() {
+        return name;
+    }
 
-//MAIN METHOD
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    // File path for hourly rates and allowances
+    private static final String EMPLOYEE_INFO = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
+    private static final Map<String, PayCalculator> employeeMapRates = new HashMap<>();
+    private static final String TIMEKEEPING_FILE = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
+    private static final int GRACE_PERIOD_MINUTES = 15;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
-        // Hardcoded file path for timekeeping data
-        String timekeepingFilePath = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping";
 
         // Load employee info from CSV
         loadEmployeeInfo();
@@ -49,7 +67,7 @@ public class PayCalculator {
         System.out.print("Enter Employee ID: ");
         String employeeID = scanner.nextLine();
 
-        //Input pay period
+        // Input pay period
         System.out.println("Choose a pay period from 2024-06-03 to 2024-12-31");
         System.out.print("Enter start date (yyyy-MM-dd): ");
         String startDateInput = scanner.nextLine();
@@ -61,20 +79,11 @@ public class PayCalculator {
             LocalDate startDate = LocalDate.parse(startDateInput);
             LocalDate endDate = LocalDate.parse(endDateInput);
 
-            // Calculate total hours worked
-            double totalWorkedHours = calculateTotalHoursWorked(timekeepingFilePath, employeeID, startDate, endDate);
-
-            // Deduct lunch and small breaks
-            int workDays = calculateWorkDays(startDate, endDate);
-            totalWorkedHours = deductBreaks(totalWorkedHours, workDays);
-
-            if (totalWorkedHours > 0) {
-                computeAndDisplayPayroll(employeeID, totalWorkedHours, startDateInput, endDateInput);
+            if (employeeMapRates.containsKey(employeeID)) {
+                computeAndDisplayPayroll(employeeID, startDate, endDate);
             } else {
-                System.out.println("No records found for the specified employee ID and cutoff period.");
+                System.out.println("Employee ID not found.");
             }
-        } catch (IOException e) {
-            System.out.println("Error reading the file: " + e.getMessage());
         } catch (DateTimeParseException e) {
             System.out.println("Error parsing date or time data: " + e.getMessage());
         }
@@ -84,147 +93,66 @@ public class PayCalculator {
     private static void loadEmployeeInfo() {
         try (BufferedReader br = new BufferedReader(new FileReader(EMPLOYEE_INFO))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                if (values.length >= 6) { // Ensure all columns exist
-                    String employeeID = values[0].trim();
-                    int riceSubsidy = Integer.parseInt(values[2].trim());
-                    int phoneAllowance = Integer.parseInt(values[3].trim());
-                    int clothingAllowance = Integer.parseInt(values[4].trim());
-                    double hourlyRate = Double.parseDouble(values[5].trim());
+            boolean isHeaderRow = true; // Flag to skip header row
 
-                    // Store all data in PayCalculator object
-                    PayCalculator empInfo = new PayCalculator(riceSubsidy, phoneAllowance, clothingAllowance, hourlyRate);
-                    employeeMapRates.put(employeeID, empInfo);
+            while ((line = br.readLine()) != null) {
+                if (isHeaderRow) {
+                    isHeaderRow = false; // Skip the header row
+                    continue;
+                }
+
+                String[] values = line.split(",");
+                if (values.length >= 7) { // Ensure all columns exist
+                    String employeeID = values[0].trim();
+                    String employeeName = values[1].trim();
+                    
+                    try {
+                        int riceSubsidy = Integer.parseInt(values[2].trim());
+                        int phoneAllowance = Integer.parseInt(values[3].trim());
+                        int clothingAllowance = Integer.parseInt(values[4].trim());
+                        double hourlyRate = Double.parseDouble(values[5].trim());
+                        String position = values[6].trim();
+
+                        // Store all data in PayCalculator object
+                        PayCalculator empInfo = new PayCalculator(riceSubsidy, phoneAllowance, clothingAllowance, hourlyRate);
+                        empInfo.setName(employeeName);
+                        empInfo.setPosition(position);
+                        employeeMapRates.put(employeeID, empInfo);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error parsing number in row: " + line);
+                        continue; // Skip to the next row
+                    }
                 }
             }
         } catch (IOException e) {
             System.err.println("Error reading the CSV file: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            System.err.println("Error parsing number: " + e.getMessage());
         }
     }
-
-    // Calculate total hours worked by an employee within a cutoff period
-    private static double calculateTotalHoursWorked(String filePath, String employeeID, LocalDate startDate, LocalDate endDate) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(filePath));
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        double totalHours = 0;
-
-        for (String line : lines) {
-            String[] data = line.split(",");
-            if (data.length < 6) continue; // Ensure there are enough columns
-
-            String id = data[0].trim();
-            if (id.equalsIgnoreCase(employeeID)) {
-                // Parse and filter by date
-                LocalDate recordDate = LocalDate.parse(data[3].trim(), dateFormatter);
-                if (recordDate.isBefore(startDate) || recordDate.isAfter(endDate)) {
-                    continue; // Skip records outside the cutoff period
-                }
-
-                LocalTime timeIn = LocalTime.parse(data[4].trim(), timeFormatter);
-                LocalTime timeOut = LocalTime.parse(data[5].trim(), timeFormatter);
-
-                Duration duration = Duration.between(timeIn, timeOut);
-                totalHours += duration.toMinutes() / 60.0; // Convert minutes to hours
-            }
-        }
-
-        return totalHours;
-    }
-
-    // Calculate the number of workdays between two dates
-    private static int calculateWorkDays(LocalDate startDate, LocalDate endDate) {
-        int workDays = 0;
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            DayOfWeek dayOfWeek = date.getDayOfWeek();
-            if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
-                workDays++; // Count only weekdays
-            }
-        }
-        return workDays;
-    }
-
-    // Deduct lunch and break hours
-    private static double deductBreaks(double totalWorkedHours, int workDays) {
-        double lunchBreak = 1.0; // 1 hour per workday
-        double smallBreaks = 0.5; // 30 minutes per workday
-        double totalBreakHours = workDays * (lunchBreak + smallBreaks); // Total break hours
-        return totalWorkedHours - totalBreakHours; // Deduct breaks from total worked hours
-    }
-    
-//COMPUTATION METHOD
-    // Compute and display payroll details
-    private static void computeAndDisplayPayroll(String employeeID, double totalWorkedHours, String startDateInput, String endDateInput) {
-        if (employeeMapRates.containsKey(employeeID)) {
-            PayCalculator empInfo = employeeMapRates.get(employeeID);
-
-            double hourlyRate = empInfo.hourlyRate;
-            double riceSubsidy = empInfo.riceSubsidy;
-            double phoneAllowance = empInfo.phoneAllowance;
-            double clothingAllowance = empInfo.clothingAllowance;
-
-            // Compute pay
-            double regularHours = Math.min(totalWorkedHours, 80); // Maximum of 80 regular hours
-            double overtimeHours = Math.max(totalWorkedHours - 80, 0); // Overtime hours
-            double overtimeRate = 1.25; // 25% additional rate for OT
-
-            double regularPay = regularHours * hourlyRate;
-            double overtimePay = overtimeHours * hourlyRate * overtimeRate;
-            double totalAllowances = riceSubsidy + phoneAllowance + clothingAllowance;
-            double grossPay = regularPay + overtimePay + totalAllowances;
-
-            // Calculate government deductions
-            double sssDeduction = calculateSSS(grossPay);
-            double philhealthDeduction = calculatePhilhealth(grossPay);
-            double pagibigDeduction = calculatePagibig(grossPay);
-
-            // Calculate taxable income (gross pay minus non-taxable deductions)
-            double taxableIncome = grossPay - (sssDeduction + philhealthDeduction + pagibigDeduction);
-
-            // Calculate withholding tax
-            double withholdingTax = calculateWithholdingTax(taxableIncome);
-
-            // Calculate total deductions
-            double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
-
-            // Calculate net pay
-            double netPay = grossPay - totalDeductions;
-            
-            // Display payroll details
-            System.out.println("\n----------------------------------------");
-            System.out.println("|       MOTOR PH PAYROLL DETAILS       |");
-            System.out.println("----------------------------------------");
-            System.out.printf("| Employee ID: %-23s |\n", employeeID);
-            System.out.printf("| Cut-off Period: %-10s to %-10s \n", startDateInput, endDateInput);
-            System.out.printf("| Total Worked Hours: %-16.2f |\n", totalWorkedHours);
-            System.out.println("----------------------------------------");
-            System.out.printf("| Hourly Rate: %-23.2f |\n", hourlyRate);
-            System.out.printf("| Regular Pay: %-23.2f |\n", regularPay);
-            System.out.printf("| Overtime Pay: %-22.2f |\n", overtimePay);
-            System.out.printf("| Total Allowances: %-18.2f |\n", totalAllowances);
-            System.out.println("----------------------------------------");
-            System.out.printf("| GROSS PAY: %-25.2f |\n", grossPay);
-            System.out.println("----------------------------------------");
-            System.out.printf("| SSS Deduction: %-21.2f |\n", sssDeduction);
-            System.out.printf("| PhilHealth Deduction: %-14.2f |\n", philhealthDeduction);
-            System.out.printf("| Pag-IBIG Deduction: %-16.2f |\n", pagibigDeduction);
-            System.out.printf("| Withholding Tax: %-19.2f |\n", withholdingTax);
-            System.out.println("----------------------------------------");
-            System.out.printf("| TOTAL DEDUCTIONS: %-18.2f |\n", totalDeductions);
-            System.out.println("----------------------------------------");
-            System.out.printf("| NET PAY: %-27.2f |\n", netPay);
-            System.out.println("----------------------------------------");
+        private static double calculateWithholdingTax(double taxableIncome) {
+        if (taxableIncome <= 20832) {
+            return 0;
+        } else if (taxableIncome <= 33333) {
+            return (taxableIncome - 20833) * 0.20;
+        } else if (taxableIncome <= 666667) {
+            return 2500 + (taxableIncome - 33333) * 0.25;
+        } else if (taxableIncome <= 166667) {
+            return 10833 + (taxableIncome - 666667) * 0.30;
+        } else if (taxableIncome <= 666667) {
+            return 40833.33 + (taxableIncome - 166667) * 0.32;
         } else {
-            System.out.println("Employee ID not found.");
+            return 200833.33 + (taxableIncome - 666667) * 0.35;
         }
     }
-//GOVERNMENT DEDUCTION
-    // SSS deduction
-    public static double calculateSSS(double grossPay) {
+  private static double calculatePagibig(double grossPay) {
+        double rate = (grossPay > 1500) ? 0.02 : 0.01;
+        return Math.min(grossPay * rate, 100); // Maximum of 100
+    }
+ private static double calculatePhilhealth(double grossPay) {
+        double rate = 0.03;
+        double contribution = grossPay * rate;
+        return Math.min(contribution / 2, 900); // Employee pays half, max of 900
+    }
+ private static double calculateSSS(double grossPay) {
         if (grossPay < 3250) {
             return 135.0;
         } else if (grossPay <= 3749.99) {
@@ -318,33 +246,161 @@ public class PayCalculator {
         }
     }
 
-// PhilHealth deduction
-    public static double calculatePhilhealth(double grossPay) {
-        double rate = 0.03;
-        double contribution = grossPay * rate;
-        return Math.min(contribution / 2, 900); // Employee pays half, max of 900
-    }
-
-// Pag-IBIG deduction
-    public static double calculatePagibig(double grossPay) {
-        double rate = (grossPay > 1500) ? 0.02 : 0.01;
-        return Math.min(grossPay * rate, 100); // Maximum of 100
-    }
-
-// Withholding Tax
-    public static double calculateWithholdingTax(double taxableIncome) {
-        if (taxableIncome <= 20832) {
-            return 0;
-        } else if (taxableIncome <= 33333) {
-            return (taxableIncome - 20833) * 0.20;
-        } else if (taxableIncome <= 66667) {
-            return 2500 + (taxableIncome - 33333) * 0.25;
-        } else if (taxableIncome <= 166667) {
-            return 10833 + (taxableIncome - 66667) * 0.30;
-        } else if (taxableIncome <= 666667) {
-            return 40833.33 + (taxableIncome - 166667) * 0.32;
-        } else {
-            return 200833.33 + (taxableIncome - 666667) * 0.35;
+    // Compute and display payroll details
+    private static void computeAndDisplayPayroll(String employeeID, LocalDate startDate, LocalDate endDate) {
+        String csvFilePath = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\MotorPHPayslip.csv";
+   
+        PayCalculator empInfo = employeeMapRates.get(employeeID);
+        if (empInfo == null) {
+            System.out.println("Employee ID not found in employee data.");
+            return;
         }
+        double hourlyRate = empInfo.hourlyRate;
+        int riceSubsidy = empInfo.riceSubsidy;
+        int phoneAllowance = empInfo.phoneAllowance;
+        int clothingAllowance = empInfo.clothingAllowance;
+        String employeeName = empInfo.getName();
+        String position = empInfo.getPosition();
+        double totalWorkedHours = 0;
+        double totalOvertimeHours = 0;
+        double totalTardinessHours = 0;
+        int daysLate = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(TIMEKEEPING_FILE))) {
+            String line;
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+             boolean isHeaderRow = true;
+
+            while ((line = br.readLine()) != null) {
+                 if (isHeaderRow) {
+                    isHeaderRow = false; // Skip the header row
+                    continue;
+                }
+                String[] data = line.split(",");
+                if (data.length < 6) continue;
+
+                String id = data[0].trim();
+                LocalDate recordDate = LocalDate.parse(data[3].trim(), dateFormatter);
+
+                if (id.equalsIgnoreCase(employeeID) && !recordDate.isBefore(startDate) && !recordDate.isAfter(endDate)) {
+                    LocalTime scheduledTimeIn = LocalTime.parse("08:00", timeFormatter); // Assuming 08:00 AM is the scheduled time-in
+                    LocalTime timeIn = LocalTime.parse(data[4].trim(), timeFormatter);
+                    LocalTime timeOut = LocalTime.parse(data[5].trim(), timeFormatter);
+
+                    Duration workDuration = Duration.between(timeIn, timeOut);
+                    double dailyWorkedHours = workDuration.toMinutes() / 60.0;
+
+                    //Tardiness Calculation with Grace Period
+                    Duration tardiness = Duration.between(scheduledTimeIn, timeIn);
+                    if (tardiness.toMinutes() > GRACE_PERIOD_MINUTES && timeIn.isAfter(scheduledTimeIn)) {
+                        totalTardinessHours += (tardiness.toMinutes() - GRACE_PERIOD_MINUTES) / 60.0;
+                        daysLate++;
+                    }
+
+                    // Overtime Calculation
+                    double regularHours = Math.min(dailyWorkedHours, 8);
+                    double overtimeHours = Math.max(dailyWorkedHours - 8, 0);
+
+                    totalWorkedHours += regularHours;
+                    totalOvertimeHours += overtimeHours;
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading timekeeping file: " + e.getMessage());
+            return;
+        }
+
+        double overtimeRate = 1.25; // 25% additional rate for OT
+        double regularPay = totalWorkedHours * hourlyRate;
+        double overtimePay = totalOvertimeHours * hourlyRate * overtimeRate;
+        double totalAllowances = riceSubsidy + phoneAllowance + clothingAllowance;
+        double grossPay = regularPay + overtimePay + totalAllowances;
+
+        // Government Deductions (applied only on the first cutoff)
+        boolean isFirstCutoff = startDate.getDayOfMonth() <= 15;
+        double sssDeduction = isFirstCutoff ? calculateSSS(grossPay) : 0;
+        double philhealthDeduction = isFirstCutoff ? calculatePhilhealth(grossPay) : 0;
+        double pagibigDeduction = isFirstCutoff ? calculatePagibig(grossPay) : 0;
+
+        double taxableIncome = grossPay - (sssDeduction + philhealthDeduction + pagibigDeduction);
+        double withholdingTax = calculateWithholdingTax(taxableIncome);
+        double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
+        double netPay = grossPay - totalDeductions;
+
+        //Tardiness Deduction
+        double tardinessDeduction = totalTardinessHours * hourlyRate;
+
+        // Format output for console and CSV
+        String payslip = String.format(
+    "\n--------------------------------------------\n" +
+    "| MOTOR PH PAYROLL DETAILS                   \n" +
+    "--------------------------------------------- \n" +
+    "| Employee ID: %-30s \n" +
+    "| Employee Name: %-28s \n" +
+    "| Position: %-30s    \n" +
+    "| Cut-off Period: %-28s \n" +
+    "| Total Worked Hours: %-10s \n" +
+    "| Tardiness: %-8s hours (PHP %-15s)\n" +
+    "| Days Late: %-30s \n" +
+    "----------------------------------------\n" +
+    "| Hourly Rate: %-2s PHP \n" +
+    "| Regular Pay: %-10s PHP \n" +
+    "| Overtime Pay: %-10s PHP \n" +
+    "| Rice Subsidy: %-2s PHP \n" +
+    "| Phone Allowance: %-2s PHP \n" +
+    "| Clothing Allowance: %-2s PHP \n" +
+    "| Total Allowances: %-2s PHP \n" +
+    "----------------------------------------\n" +
+    "| GROSS PAY: %-2s PHP\n" +
+    "----------------------------------------\n" +
+    "| SSS Deduction: %-2s PHP\n" +
+    "| PhilHealth Deduction: %-2s PHP\n" +
+    "| Pag-IBIG Deduction: %-2s PHP\n" +
+    "| Withholding Tax: %-2s PHP\n" +
+    "----------------------------------------\n" +
+    "| TOTAL DEDUCTIONS: %-2s PHP\n" +
+    "----------------------------------------\n" +
+    "| NET PAY: %-2s PHP\n" +
+    "----------------------------------------\n",
+    employeeID, employeeName, position,
+    startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " + endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+    totalWorkedHours, totalTardinessHours, -tardinessDeduction, daysLate,
+    hourlyRate, regularPay, overtimePay,
+    riceSubsidy, phoneAllowance, clothingAllowance, totalAllowances,
+    grossPay, sssDeduction, philhealthDeduction, pagibigDeduction, withholdingTax,
+    totalDeductions, netPay
+);
+
+// Print to console
+System.out.println(payslip);
+
+
+
+
+    // CSV data
+    List<String> csvData = Arrays.asList(
+        employeeID, employeeName, position,
+        startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " + endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+        String.valueOf(totalWorkedHours), String.valueOf(totalTardinessHours), String.valueOf(-tardinessDeduction), String.valueOf(daysLate),
+        String.valueOf(hourlyRate), String.valueOf(regularPay), String.valueOf(overtimePay),
+        String.valueOf(riceSubsidy), String.valueOf(phoneAllowance), String.valueOf(clothingAllowance), String.valueOf(totalAllowances),
+        String.valueOf(grossPay), String.valueOf(sssDeduction), String.valueOf(philhealthDeduction), String.valueOf(pagibigDeduction), String.valueOf(withholdingTax),
+        String.valueOf(totalDeductions), String.valueOf(netPay)
+    );
+
+        String csvFilePathLocal = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\MotorPHPayslip.csv";
+
+    // Write to CSV file
+    try {
+        Files.write(
+            Paths.get(csvFilePathLocal),
+            (String.join(",", csvData) + System.lineSeparator()).getBytes(),
+            StandardOpenOption.CREATE, StandardOpenOption.APPEND
+        );
+        System.out.println("Payroll data saved to " + csvFilePathLocal);
+    } catch (IOException e) {
+        System.err.println("Error writing to CSV file: " + e.getMessage());
+    }
     }
 }
