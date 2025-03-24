@@ -52,6 +52,7 @@ public class PayCalculator {
     }
 
     // File path for hourly rates and allowances
+
     private static final String EMPLOYEE_INFO = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
     private static final Map<String, PayCalculator> employeeMapRates = new HashMap<>();
     private static final String TIMEKEEPING_FILE = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
@@ -59,6 +60,10 @@ public class PayCalculator {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
+        // Hardcoded file path for timekeeping data
+        String timekeepingFilePath = "C:\\Users\\Mico\\Documents\\NetBeansProjects\\Mico's_Branch\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping";
+
 
         // Load employee info from CSV
         loadEmployeeInfo();
@@ -147,11 +152,88 @@ public class PayCalculator {
         double rate = (grossPay > 1500) ? 0.02 : 0.01;
         return Math.min(grossPay * rate, 100); // Maximum of 100
     }
+    
+//COMPUTATION METHOD
+    // Compute and display payroll details
+    private static void computeAndDisplayPayroll(String employeeID, double totalWorkedHours, String startDateInput, String endDateInput) {
+        if (employeeMapRates.containsKey(employeeID)) {
+            PayCalculator empInfo = employeeMapRates.get(employeeID);
+            
+            // Determine cutoff type based on start date
+            LocalDate startDate = LocalDate.parse(startDateInput);
+            boolean isFirstCutoff = startDate.getDayOfMonth() <= 15; // Checks if cutoff starts in first half of month
+             
+            double hourlyRate = empInfo.hourlyRate;
+            double riceSubsidy = empInfo.riceSubsidy;
+            double phoneAllowance = empInfo.phoneAllowance;
+            double clothingAllowance = empInfo.clothingAllowance;
+
+            // Compute pay
+            double regularHours = Math.min(totalWorkedHours, 80); // Maximum of 80 regular hours
+            double overtimeHours = Math.max(totalWorkedHours - 80, 0); // Overtime hours
+            double overtimeRate = 1.25; // 25% additional rate for OT
+
+            double regularPay = regularHours * hourlyRate;
+            double overtimePay = overtimeHours * hourlyRate * overtimeRate;
+            double totalAllowances = riceSubsidy + phoneAllowance + clothingAllowance;
+            double grossPay = regularPay + overtimePay + totalAllowances;
+
+            // Calculates government deductions based on cut-off type
+            double sssDeduction = isFirstCutoff ? calculateSSS(grossPay) : 0.0; // Only deducts SSS in 1st cut-off
+            double philhealthDeduction = isFirstCutoff ? calculatePhilhealth(grossPay) : 0.0; // Only deducts PhilHealth in 1st cut-off
+            double pagibigDeduction = isFirstCutoff ? calculatePagibig(grossPay) : 0.0; // Only deducts Pag-IBIG in 1st cut-off
+
+            // Calculates taxable income (gross pay minus non-taxable deductions)
+            double taxableIncome = grossPay - (sssDeduction + philhealthDeduction + pagibigDeduction);
+
+            // Calculates full withholding tax for the month
+            double fullWithholdingTax = calculateWithholdingTax(taxableIncome);
+            
+            // Divides the total withholding tax equally between both cut-off periods
+            double withholdingTax = fullWithholdingTax / 2;
+            
+            // Prepare display values
+            String sssDisplay = isFirstCutoff ? String.format("%.2f", sssDeduction) : "-"; // Shows "-" for non-applicable deductions in the 2nd cut-off
+            String philhealthDisplay = isFirstCutoff ? String.format("%.2f", philhealthDeduction) : "-";
+            String pagibigDisplay = isFirstCutoff ? String.format("%.2f", pagibigDeduction) : "-";
+            
+            // Calculates final deductions and net pay
+            double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
+            double netPay = grossPay - totalDeductions;
+            
+            // Display payroll details
+            System.out.println("\n----------------------------------------");
+            System.out.printf("| MOTOR PH PAYROLL DETAILS - %s Cutoff |\n", isFirstCutoff ? "1st" : "2nd"); // Shows cut-off type in header
+            System.out.println("----------------------------------------");
+            System.out.printf("| Employee ID: %-23s |\n", employeeID);
+            System.out.printf("| Cut-off Period: %-10s to %-10s \n", startDateInput, endDateInput);
+            System.out.printf("| Total Worked Hours: %-16.2f |\n", totalWorkedHours);
+            System.out.println("----------------------------------------");
+            System.out.printf("| Hourly Rate: %-23.2f |\n", hourlyRate);
+            System.out.printf("| Regular Pay: %-23.2f |\n", regularPay);
+            System.out.printf("| Overtime Pay: %-22.2f |\n", overtimePay);
+            System.out.printf("| Total Allowances: %-18.2f |\n", totalAllowances);
+            System.out.println("----------------------------------------");
+            System.out.printf("| GROSS PAY: %-25.2f |\n", grossPay);
+            System.out.println("----------------------------------------");
+            System.out.printf("| SSS Deduction: %-21s |\n", sssDisplay);
+            System.out.printf("| PhilHealth Deduction: %-14s |\n", philhealthDisplay);
+            System.out.printf("| Pag-IBIG Deduction: %-16s |\n", pagibigDisplay);
+            System.out.printf("| Withholding Tax: %-19.2f |\n", withholdingTax);
+            System.out.println("----------------------------------------");
+            System.out.printf("| TOTAL DEDUCTIONS: %-18.2f |\n", totalDeductions);
+            System.out.println("----------------------------------------");
+            System.out.printf("| NET PAY: %-27.2f |\n", netPay);
+            System.out.println("----------------------------------------");
+        } else {
+            System.out.println("Employee ID not found.");
+            }
  private static double calculatePhilhealth(double grossPay) {
         double rate = 0.03;
         double contribution = grossPay * rate;
         return Math.min(contribution / 2, 900); // Employee pays half, max of 900
     }
+  
  private static double calculateSSS(double grossPay) {
         if (grossPay < 3250) {
             return 135.0;
