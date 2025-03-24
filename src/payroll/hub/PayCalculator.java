@@ -52,14 +52,14 @@ public class PayCalculator {
     }
 
     // File path for hourly rates and allowances
-
-    private static final String EMPLOYEE_INFO = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
+    private static final String EMPLOYEE_INFO = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
     private static final Map<String, PayCalculator> employeeMapRates = new HashMap<>();
-    private static final String TIMEKEEPING_FILE = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
-    private static final int GRACE_PERIOD_MINUTES = 15;
+    private static final String TIMEKEEPING_FILE = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
+    private static final int GRACE_PERIOD_MINUTES = 10;
 
     public static void main(String[] args) {
-
+        Scanner scanner = new Scanner(System.in);
+        
         // Hardcoded file path for timekeeping data
         String timekeepingFilePath = "C:\\Users\\Mico\\Documents\\NetBeansProjects\\Mico's_Branch\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping";
 
@@ -227,7 +227,7 @@ public class PayCalculator {
         } else {
             System.out.println("Employee ID not found.");
             }
-        
+    }
  private static double calculatePhilhealth(double grossPay) {
         double rate = 0.03;
         double contribution = grossPay * rate;
@@ -414,45 +414,58 @@ public class PayCalculator {
         double tardinessDeduction = totalTardinessHours * hourlyRate;
 
         // Format output for console and CSV
-        String payslip = String.format(
-    "\n--------------------------------------------\n" +
-    "| MOTOR PH PAYROLL DETAILS                   \n" +
-    "--------------------------------------------- \n" +
-    "| Employee ID: %-30s \n" +
-    "| Employee Name: %-28s \n" +
-    "| Position: %-30s    \n" +
-    "| Cut-off Period: %-28s \n" +
-    "| Total Worked Hours: %-10s \n" +
-    "| Tardiness: %-8s hours (PHP %-15s)\n" +
-    "| Days Late: %-30s \n" +
-    "----------------------------------------\n" +
-    "| Hourly Rate: %-2s PHP \n" +
-    "| Regular Pay: %-10s PHP \n" +
-    "| Overtime Pay: %-10s PHP \n" +
-    "| Rice Subsidy: %-2s PHP \n" +
-    "| Phone Allowance: %-2s PHP \n" +
-    "| Clothing Allowance: %-2s PHP \n" +
-    "| Total Allowances: %-2s PHP \n" +
-    "----------------------------------------\n" +
-    "| GROSS PAY: %-2s PHP\n" +
-    "----------------------------------------\n" +
-    "| SSS Deduction: %-2s PHP\n" +
-    "| PhilHealth Deduction: %-2s PHP\n" +
-    "| Pag-IBIG Deduction: %-2s PHP\n" +
-    "| Withholding Tax: %-2s PHP\n" +
-    "----------------------------------------\n" +
-    "| TOTAL DEDUCTIONS: %-2s PHP\n" +
-    "----------------------------------------\n" +
-    "| NET PAY: %-2s PHP\n" +
-    "----------------------------------------\n",
-    employeeID, employeeName, position,
-    startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " + endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-    totalWorkedHours, totalTardinessHours, -tardinessDeduction, daysLate,
-    hourlyRate, regularPay, overtimePay,
-    riceSubsidy, phoneAllowance, clothingAllowance, totalAllowances,
-    grossPay, sssDeduction, philhealthDeduction, pagibigDeduction, withholdingTax,
-    totalDeductions, netPay
-);
+    String payslip = String.format(
+        "\n======================================================\n"
+        + "               MOTORPH PAYROLL STATEMENT              \n"
+        + "======================================================\n"
+        + "  Employee: %-36s\n"
+        + "  ID: %-41s\n"
+        + "  Position: %-37s\n"
+        + "  Period: %-38s\n"
+        + "  Hourly Rate: P%.2f\n"
+        + "  Days Late: %d\n"
+        + "------------------------------------------------------\n"
+        + "  Description             Hours          Amount\n"
+        + "------------------------------------------------------\n"
+        + "  Basic Pay               %7.2f       P%11.2f\n"
+        + "  Overtime (1.25x rate)   %7.2f       P%11.2f\n"
+        + "  Tardiness               %7.2f      -P%10.2f\n"
+        + "  Rice Subsidy            %7s       P%11.2f\n"
+        + "  Phone Allowance         %7s       P%11.2f\n"
+        + "  Clothing Allowance      %7s       P%11.2f\n"
+        + "------------------------------------------------------\n"
+        + "  GROSS PAY                            P%11.2f\n"
+        + "------------------------------------------------------\n"
+        + "  SSS Deduction                      -P%10.2f\n"
+        + "  PhilHealth                         -P%10.2f\n"
+        + "  Pag-IBIG                           -P%10.2f\n"
+        + "  Withholding Tax                    -P%10.2f\n"
+        + "------------------------------------------------------\n"
+        + "  TOTAL DEDUCTIONS                  -P%10.2f\n"
+        + "======================================================\n"
+        + "  NET PAY: P%.2f\n"
+        + "======================================================\n",
+        // Arguments
+        employeeName,
+        employeeID,
+        position,
+        startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " + endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+        hourlyRate, // %.2f
+        daysLate, // %d
+        totalWorkedHours, regularPay,
+        totalOvertimeHours, overtimePay,
+        totalTardinessHours, tardinessDeduction,
+        "", (double) riceSubsidy,
+        "", (double) phoneAllowance,
+        "", (double) clothingAllowance,
+        grossPay,
+        sssDeduction,
+        philhealthDeduction,
+        pagibigDeduction,
+        withholdingTax,
+        totalDeductions,
+        netPay
+    );
 
 // Print to console
 System.out.println(payslip);
@@ -469,7 +482,7 @@ System.out.println(payslip);
         String.valueOf(totalDeductions), String.valueOf(netPay)
     );
 
-        String csvFilePathLocal = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\MotorPHPayslip.csv";
+        String csvFilePathLocal = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\MotorPHPayslip.csv";
 
     // Write to CSV file
     try {
