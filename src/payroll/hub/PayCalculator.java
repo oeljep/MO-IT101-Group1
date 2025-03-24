@@ -6,7 +6,7 @@ package payroll.hub;
 
 /**
  *
- * @author Jomax
+ * @author rowel
  */
 
 import java.io.*;
@@ -59,7 +59,6 @@ public class PayCalculator {
     private static final int GRACE_PERIOD_MINUTES = 15;
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
         // Hardcoded file path for timekeeping data
         String timekeepingFilePath = "C:\\Users\\Mico\\Documents\\NetBeansProjects\\Mico's_Branch\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping";
@@ -228,6 +227,7 @@ public class PayCalculator {
         } else {
             System.out.println("Employee ID not found.");
             }
+        
  private static double calculatePhilhealth(double grossPay) {
         double rate = 0.03;
         double contribution = grossPay * rate;
@@ -456,8 +456,6 @@ public class PayCalculator {
 
 // Print to console
 System.out.println(payslip);
-
-
 
 
     // CSV data
