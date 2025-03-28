@@ -147,87 +147,12 @@ public class PayCalculator {
             return 200833.33 + (taxableIncome - 666667) * 0.35;
         }
     }
+        
   private static double calculatePagibig(double grossPay) {
         double rate = (grossPay > 1500) ? 0.02 : 0.01;
         return Math.min(grossPay * rate, 100); // Maximum of 100
     }
-    
-//COMPUTATION METHOD
-    // Compute and display payroll details
-    private static void computeAndDisplayPayroll(String employeeID, double totalWorkedHours, String startDateInput, String endDateInput) {
-        if (employeeMapRates.containsKey(employeeID)) {
-            PayCalculator empInfo = employeeMapRates.get(employeeID);
-            
-            // Determine cutoff type based on start date
-            LocalDate startDate = LocalDate.parse(startDateInput);
-            boolean isFirstCutoff = startDate.getDayOfMonth() <= 15; // Checks if cutoff starts in first half of month
-             
-            double hourlyRate = empInfo.hourlyRate;
-            double riceSubsidy = empInfo.riceSubsidy;
-            double phoneAllowance = empInfo.phoneAllowance;
-            double clothingAllowance = empInfo.clothingAllowance;
-
-            // Compute pay
-            double regularHours = Math.min(totalWorkedHours, 80); // Maximum of 80 regular hours
-            double overtimeHours = Math.max(totalWorkedHours - 80, 0); // Overtime hours
-            double overtimeRate = 1.25; // 25% additional rate for OT
-
-            double regularPay = regularHours * hourlyRate;
-            double overtimePay = overtimeHours * hourlyRate * overtimeRate;
-            double totalAllowances = riceSubsidy + phoneAllowance + clothingAllowance;
-            double grossPay = regularPay + overtimePay + totalAllowances;
-
-            // Calculates government deductions based on cut-off type
-            double sssDeduction = isFirstCutoff ? calculateSSS(grossPay) : 0.0; // Only deducts SSS in 1st cut-off
-            double philhealthDeduction = isFirstCutoff ? calculatePhilhealth(grossPay) : 0.0; // Only deducts PhilHealth in 1st cut-off
-            double pagibigDeduction = isFirstCutoff ? calculatePagibig(grossPay) : 0.0; // Only deducts Pag-IBIG in 1st cut-off
-
-            // Calculates taxable income (gross pay minus non-taxable deductions)
-            double taxableIncome = grossPay - (sssDeduction + philhealthDeduction + pagibigDeduction);
-
-            // Calculates full withholding tax for the month
-            double fullWithholdingTax = calculateWithholdingTax(taxableIncome);
-            
-            // Divides the total withholding tax equally between both cut-off periods
-            double withholdingTax = fullWithholdingTax / 2;
-            
-            // Prepare display values
-            String sssDisplay = isFirstCutoff ? String.format("%.2f", sssDeduction) : "-"; // Shows "-" for non-applicable deductions in the 2nd cut-off
-            String philhealthDisplay = isFirstCutoff ? String.format("%.2f", philhealthDeduction) : "-";
-            String pagibigDisplay = isFirstCutoff ? String.format("%.2f", pagibigDeduction) : "-";
-            
-            // Calculates final deductions and net pay
-            double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
-            double netPay = grossPay - totalDeductions;
-            
-            // Display payroll details
-            System.out.println("\n----------------------------------------");
-            System.out.printf("| MOTOR PH PAYROLL DETAILS - %s Cutoff |\n", isFirstCutoff ? "1st" : "2nd"); // Shows cut-off type in header
-            System.out.println("----------------------------------------");
-            System.out.printf("| Employee ID: %-23s |\n", employeeID);
-            System.out.printf("| Cut-off Period: %-10s to %-10s \n", startDateInput, endDateInput);
-            System.out.printf("| Total Worked Hours: %-16.2f |\n", totalWorkedHours);
-            System.out.println("----------------------------------------");
-            System.out.printf("| Hourly Rate: %-23.2f |\n", hourlyRate);
-            System.out.printf("| Regular Pay: %-23.2f |\n", regularPay);
-            System.out.printf("| Overtime Pay: %-22.2f |\n", overtimePay);
-            System.out.printf("| Total Allowances: %-18.2f |\n", totalAllowances);
-            System.out.println("----------------------------------------");
-            System.out.printf("| GROSS PAY: %-25.2f |\n", grossPay);
-            System.out.println("----------------------------------------");
-            System.out.printf("| SSS Deduction: %-21s |\n", sssDisplay);
-            System.out.printf("| PhilHealth Deduction: %-14s |\n", philhealthDisplay);
-            System.out.printf("| Pag-IBIG Deduction: %-16s |\n", pagibigDisplay);
-            System.out.printf("| Withholding Tax: %-19.2f |\n", withholdingTax);
-            System.out.println("----------------------------------------");
-            System.out.printf("| TOTAL DEDUCTIONS: %-18.2f |\n", totalDeductions);
-            System.out.println("----------------------------------------");
-            System.out.printf("| NET PAY: %-27.2f |\n", netPay);
-            System.out.println("----------------------------------------");
-        } else {
-            System.out.println("Employee ID not found.");
-            }
-    }
+  
  private static double calculatePhilhealth(double grossPay) {
         double rate = 0.03;
         double contribution = grossPay * rate;
@@ -429,21 +354,21 @@ public class PayCalculator {
         + "------------------------------------------------------\n"
         + "  Basic Pay               %7.2f       P%11.2f\n"
         + "  Overtime (1.25x rate)   %7.2f       P%11.2f\n"
-        + "  Tardiness               %7.2f      -P%10.2f\n"
+        + "  Tardiness               -%6.2f      -P%11.2f\n"
         + "  Rice Subsidy            %7s       P%11.2f\n"
         + "  Phone Allowance         %7s       P%11.2f\n"
         + "  Clothing Allowance      %7s       P%11.2f\n"
         + "------------------------------------------------------\n"
-        + "  GROSS PAY                            P%11.2f\n"
+        + "  GROSS PAY                            P%12.2f\n"
         + "------------------------------------------------------\n"
-        + "  SSS Deduction                      -P%10.2f\n"
-        + "  PhilHealth                         -P%10.2f\n"
-        + "  Pag-IBIG                           -P%10.2f\n"
-        + "  Withholding Tax                    -P%10.2f\n"
+        + "  SSS Deduction                        -P%11.2f\n"
+        + "  PhilHealth                           -P%11.2f\n"
+        + "  Pag-IBIG                             -P%11.2f\n"
+        + "  Withholding Tax                      -P%11.2f\n"
         + "------------------------------------------------------\n"
-        + "  TOTAL DEDUCTIONS                  -P%10.2f\n"
+        + "  TOTAL DEDUCTIONS                   -P%13.2f\n"
         + "======================================================\n"
-        + "  NET PAY: P%.2f\n"
+        + "  NET PAY:                            P%13.2f\n"
         + "======================================================\n",
         // Arguments
         employeeName,
