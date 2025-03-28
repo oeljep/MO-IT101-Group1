@@ -7,42 +7,52 @@ Payroll Hub is a simple payroll system that:
 - Determines net pay based on worked hours  
 - Reads employee data from CSV files for processing  
 
-This project is implemented in **Java**, using `BufferedReader` for input processing. 
+This project is implemented in **Java**.
 
 ---
 
-For
-## 📊 **Sample Output**  
+## 📊 **Expected Output**  
 
 ```java
+run:
 Enter Employee ID: 10001
-Enter start date (yyyy-MM-dd): 2024-07-01
-Enter end date (yyyy-MM-dd): 2024-07-15
--------------------------------------------
-|           PAYROLL DETAILS               |
--------------------------------------------
-| Employee Info                           |
-| ID: 10001                               |
-| Name: Manuel III Garcia                 |
-| Hourly Rate: 535.71                     |
--------------------------------------------
-| Cut-off Period: 2024-07-01 - 2024-07-15 |
-| Total Worked Hours:    86.43 hours      |
-| Rice Subsidy:          1,500.00         |
-| Phone Allowance        2,000.00         |
-| Clothing Allowance     1,000.00         |
-|                                         |
-| GROSS PAY             50,801.42         |
--------------------------------------------
-| Social Security System:  900.00	   |
-| Philhealth:	        450.00      |		
-| Pag-Ibig:			     100.00     |		
-| Withholding Tax			  0.00      |		
-|                                         |
-| TOTAL DEDUCTIONS			   1,450.00       |		
--------------------------------------------
-| NET PAY                 49,351.42       |
--------------------------------------------
+Choose a pay period from 2024-06-03 to 2024-12-31
+Enter start date (yyyy-MM-dd): 2024-06-16
+Enter end date (yyyy-MM-dd): 2024-06-28
+
+======================================================
+               MOTORPH PAYROLL STATEMENT              
+======================================================
+  Employee: Garcia Manuel III                   
+  ID: 10001                                    
+  Position: Chief Executive Officer              
+  Period: 2024-06-16 to 2024-06-28              
+  Hourly Rate: P535.71
+  Days Late: 10
+------------------------------------------------------
+  Description             Hours          Amount
+------------------------------------------------------
+  Basic Pay                 77.80       P   41678.24
+  Overtime (1.25x rate)     13.52       P    9051.27
+  Tardiness               -  9.07      -P    4857.10
+  Rice Subsidy                          P    1500.00
+  Phone Allowance                       P    2000.00
+  Clothing Allowance                    P    1000.00
+------------------------------------------------------
+  GROSS PAY                            P    55229.50
+------------------------------------------------------
+  SSS Deduction                        -P       0.00
+  PhilHealth                           -P       0.00
+  Pag-IBIG                             -P       0.00
+  Withholding Tax                      -P    7974.13
+------------------------------------------------------
+  TOTAL DEDUCTIONS                  -P      7974.13
+======================================================
+  NET PAY:                           P     47255.38
+======================================================
+
+Payroll data saved to C:\Users\rowel\OneDrive\Documents\NetBeansProjects\Payroll Hub\src\payroll\hub\MotorPHPayslip.csv
+BUILD SUCCESSFUL (total time: 18 seconds)
 ```
 
 ## ⚙️ **Features**  
@@ -55,9 +65,10 @@ Enter end date (yyyy-MM-dd): 2024-07-15
 
 ## 📂 **File Handling**  
 The program reads input from:  
-📌 `employeetest.csv` (Employee details)  
-📌 `attendancetest.csv` (Attendance records)  
-📌 `employeeinfo&timekeeping.csv` (Employee Details & Attendance records)  
+📌 `employeeinfo_timekeeping.csv` (Timekeeping records)  input
+📌 `hourlyrate_allowances.csv` (Hourly rate & allowances)  input
+
+📌 `src/MotorPHPayslip.csv` (Writes the output into csv format) 
 
 ---
 
@@ -65,28 +76,21 @@ The program reads input from:
 ```sh
 /PayrollHub
 ├── src/
-│   ├── SAMPLE.java
-│   ├── SalaryComputation.java
-│   ├── attendancetest.csv
-│   ├── employeetest.csv
-│   ├── employeeInfo.java
-│   ├── employeeinfo&timekeeping.java
-│   ├── governmentDeductions.java
-│   ├── hoursWorked.java
-│   └── salaryWorked.java
+│   ├── MotorPHPayslip.csv
+│   ├── PayCalculator.java
+├── payroll.hub.databeses/
+│   ├── MotorPHPayslip.csv
+│   ├── employeeinfo_timekeeping.csv
+│   ├── hourlyrate_allowances.csv
 ├── README.md
 ├── .gitignore
 └── LICENSE
 ```
 ## 🚧 **Project Status**  
-🔧 **In Progress**  
+🔧 **Completed**  
 
 ### 🔍 **Things to Improve**  
-- Fix syntax errors across files  
-- User doesn't have any idea what are the available cut off periods.
-- Hourly rate is absolute
-- Allowances are not yet introduce
-- Government deduction are not yet introduce
+-
 
 ---
 
@@ -99,7 +103,6 @@ The program reads input from:
 | Danielle Sophia Pasion | [@DanielleSophiaFP](https://github.com/DanielleSophiaFP) |
 | Mico Angelo Uy | [@ocims7](https://github.com/ocims7) |
 | Maila Yruma | [@maila02](https://github.com/maila02) |
-| Ericson Renion | - |
 | Jose Maximo E. Ronquillo | [@joma001](https://github.com/joma001) |
 | James Angeles | [@Jamesangeles-byte](https://github.com/Jamesangeles-byte) |
 | Edward Joseph Basilonia | [@EJB0624](https://github.com/EJB0624) |
@@ -112,4 +115,4 @@ The program reads input from:
 ```sh
 git clone https://github.com/your-repo/payroll-hub.git
 ```
-2️⃣ Run **SalaryComputation.java**
+2️⃣ Run **Payroll Hub**
