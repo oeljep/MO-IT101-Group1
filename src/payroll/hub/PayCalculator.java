@@ -52,26 +52,25 @@ public class PayCalculator {
     }
 
     // File path for hourly rates and allowances
-    private static final String EMPLOYEE_INFO = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
+    private static final String EMPLOYEE_INFO = "C:\\Users\\USER\\Documents\\NetBeansProjects\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
     private static final Map<String, PayCalculator> employeeMapRates = new HashMap<>();
-    private static final String TIMEKEEPING_FILE = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
+    private static final String TIMEKEEPING_FILE = "C:\\Users\\USER\\Documents\\NetBeansProjects\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
     private static final int GRACE_PERIOD_MINUTES = 10;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
         // Hardcoded file path for timekeeping data
-        String timekeepingFilePath = "C:\\Users\\Mico\\Documents\\NetBeansProjects\\Mico's_Branch\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping";
+        String timekeepingFilePath = "C:\\Users\\USER\\Documents\\NetBeansProjects\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
 
+        boolean Continue = true; // to continue the program
 
-        // Load employee info from CSV
-        loadEmployeeInfo();
+    while (Continue) {
 
-        // Get employee ID and cutoff period from user
+        // Prompt user for input
         System.out.print("Enter Employee ID: ");
         String employeeID = scanner.nextLine();
 
-        // Input pay period
         System.out.println("Choose a pay period from 2024-06-03 to 2024-12-31");
         System.out.print("Enter start date (yyyy-MM-dd): ");
         String startDateInput = scanner.nextLine();
@@ -83,6 +82,10 @@ public class PayCalculator {
             LocalDate startDate = LocalDate.parse(startDateInput);
             LocalDate endDate = LocalDate.parse(endDateInput);
 
+            // Load employee info if not already loaded
+            loadEmployeeInfo();
+
+            // Validate and compute payroll for the employee
             if (employeeMapRates.containsKey(employeeID)) {
                 computeAndDisplayPayroll(employeeID, startDate, endDate);
             } else {
@@ -91,6 +94,18 @@ public class PayCalculator {
         } catch (DateTimeParseException e) {
             System.out.println("Error parsing date or time data: " + e.getMessage());
         }
+
+        // Prompt user to continue or exit
+        System.out.print("\nWould you like to compute payroll for another employee? (yes/no): ");
+        String userChoice = scanner.nextLine().trim().toLowerCase();
+
+        if (userChoice.equals("no")) {
+            Continue = false; // Exit the loop
+            System.out.println("Thank you for using the MotorPh Payroll Hub.");
+        }
+    }
+    scanner.close(); // Close scanner to free resources
+
     }
 
     // Load employee info from CSV into HashMap
@@ -255,7 +270,7 @@ public class PayCalculator {
 
     // Compute and display payroll details
     private static void computeAndDisplayPayroll(String employeeID, LocalDate startDate, LocalDate endDate) {
-        String csvFilePath = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\MotorPHPayslip.csv";
+        String csvFilePath = "C:\\Users\\USER\\Documents\\NetBeansProjects\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\MotorPHPayslip.csv";
    
         PayCalculator empInfo = employeeMapRates.get(employeeID);
         if (empInfo == null) {
@@ -410,7 +425,7 @@ System.out.println(payslip);
         String.valueOf(totalDeductions), String.valueOf(netPay)
     );
 
-        String csvFilePathLocal = "C:\\Users\\rowel\\OneDrive\\Documents\\NetBeansProjects\\Payroll Hub\\src\\payroll\\hub\\MotorPHPayslip.csv";
+        String csvFilePathLocal = "C:\\Users\\USER\\Documents\\NetBeansProjects\\MO-IT101-Group1\\src\\payroll\\hub\\MotorPHPayslip.csv";
 
     // Write to CSV file
     try {
