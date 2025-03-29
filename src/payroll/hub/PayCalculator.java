@@ -334,6 +334,9 @@ public class PayCalculator {
         double withholdingTax = calculateWithholdingTax(taxableIncome);
         double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
         double netPay = grossPay - totalDeductions;
+        
+        // Divide the withholding tax by 2 for the cut-offs
+        double adjustedWithholdingTax = withholdingTax / 2.0;
 
         //Tardiness Deduction
         double tardinessDeduction = totalTardinessHours * hourlyRate;
@@ -387,7 +390,7 @@ public class PayCalculator {
         sssDeduction,
         philhealthDeduction,
         pagibigDeduction,
-        withholdingTax,
+        adjustedWithholdingTax,
         totalDeductions,
         netPay
     );
