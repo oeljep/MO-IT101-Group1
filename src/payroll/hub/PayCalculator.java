@@ -63,10 +63,6 @@ public class PayCalculator {
         // Hardcoded file path for timekeeping data
         String timekeepingFilePath = "C:\\Users\\USER\\Documents\\NetBeansProjects\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
 
-
-        // Load employee info from CSV
-        loadEmployeeInfo();
-
         boolean Continue = true; // to continue the program
 
     while (Continue) {
@@ -82,7 +78,7 @@ public class PayCalculator {
         String endDateInput = scanner.nextLine();
 
         try {
-            // Parse input dates
+            // Parse the input dates
             LocalDate startDate = LocalDate.parse(startDateInput);
             LocalDate endDate = LocalDate.parse(endDateInput);
 
