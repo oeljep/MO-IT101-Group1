@@ -9,6 +9,11 @@ package payroll.hub;
  * @author Jomax
  */
 
+/*
+ * This program calculates payroll details for employees, including gross pay, deductions, and net pay,
+ * based on their worked hours, allowances, and government-mandated contributions.
+ */
+
 import java.io.*;
 import java.time.*;
 import java.time.format.*;
@@ -19,14 +24,14 @@ import java.nio.file.StandardOpenOption;
 public class PayCalculator {
 
     // Fields for employee allowances, hourly rate, name, and position
-    private int riceSubsidy;
-    private int phoneAllowance;
-    private int clothingAllowance;
-    private double hourlyRate;
-    private String name; // Added field for employee name
-    private String position; // Added field for employee position
+    private int riceSubsidy; // Monthly rice subsidy allowance
+    private int phoneAllowance; // Monthly phone allowance
+    private int clothingAllowance; // Monthly clothing allowance
+    private double hourlyRate; // Hourly rate of the employee
+    private String name; // Name of the employee
+    private String position; // Position of the employee
 
-    // Constructor for PayCalculator
+    // Constructor to initialize PayCalculator with allowances and hourly rate
     public PayCalculator(int riceSubsidy, int phoneAllowance, int clothingAllowance, double hourlyRate) {
         this.riceSubsidy = riceSubsidy;
         this.phoneAllowance = phoneAllowance;
@@ -34,7 +39,7 @@ public class PayCalculator {
         this.hourlyRate = hourlyRate;
     }
 
-    // Getters and setters for new fields
+    // Getters and setters for employee name and position
     public String getName() {
         return name;
     }
@@ -51,49 +56,51 @@ public class PayCalculator {
         this.position = position;
     }
 
-    // File path for hourly rates and allowances
-    private static final String EMPLOYEE_INFO = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv";
-    private static final Map<String, PayCalculator> employeeMapRates = new HashMap<>();
-    private static final String TIMEKEEPING_FILE = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv";
-    private static final int GRACE_PERIOD_MINUTES = 15;
+    // File paths for employee data and timekeeping records
+    private static final String EMPLOYEE_INFO = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\hourlyrate_allowances.csv"; // Path to employee info CSV file
+    private static final Map<String, PayCalculator> employeeMapRates = new HashMap<>(); // Stores employee data
+    private static final String TIMEKEEPING_FILE = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\databases\\employeeinfo_timekeeping.csv"; // Path to timekeeping CSV file
+    private static final int GRACE_PERIOD_MINUTES = 15; // Grace period for tardiness in minutes
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Load employee info from CSV
+        // Load employee information from a CSV file into memory
         loadEmployeeInfo();
 
-        // Get employee ID and cutoff period from user
+        // Prompt user to enter Employee ID and cutoff period dates
         System.out.print("Enter Employee ID: ");
         String employeeID = scanner.nextLine();
 
-        // Input pay period
-        System.out.println("Choose a pay period from 2024-06-03 to 2024-12-31");
+        System.out.println("Choose a pay period between 2024-06-03 and 2024-12-31");
         System.out.print("Enter start date (yyyy-MM-dd): ");
         String startDateInput = scanner.nextLine();
         System.out.print("Enter end date (yyyy-MM-dd): ");
         String endDateInput = scanner.nextLine();
 
         try {
-            // Parse the input dates
+            // Parse the entered dates into LocalDate objects
             LocalDate startDate = LocalDate.parse(startDateInput);
             LocalDate endDate = LocalDate.parse(endDateInput);
 
+            // Check if the Employee ID exists in the loaded data
             if (employeeMapRates.containsKey(employeeID)) {
-                computeAndDisplayPayroll(employeeID, startDate, endDate);
+                computeAndDisplayPayroll(employeeID, startDate, endDate); // Calculate and display payroll details
             } else {
-                System.out.println("Employee ID not found.");
+                System.out.println("Employee ID not found."); // Error message if Employee ID is invalid
             }
         } catch (DateTimeParseException e) {
-            System.out.println("Error parsing date or time data: " + e.getMessage());
+            System.out.println("Error parsing date or time data: " + e.getMessage()); // Error message for invalid date format
         }
     }
 
-    // Load employee info from CSV into HashMap
+    /**
+     * Loads employee information from a CSV file into a HashMap for easy access.
+     */
     private static void loadEmployeeInfo() {
         try (BufferedReader br = new BufferedReader(new FileReader(EMPLOYEE_INFO))) {
             String line;
-            boolean isHeaderRow = true; // Flag to skip header row
+            boolean isHeaderRow = true; // Flag to skip the header row
 
             while ((line = br.readLine()) != null) {
                 if (isHeaderRow) {
@@ -102,33 +109,34 @@ public class PayCalculator {
                 }
 
                 String[] values = line.split(",");
-                if (values.length >= 7) { // Ensure all columns exist
-                    String employeeID = values[0].trim();
-                    String employeeName = values[1].trim();
-                    
-                    try {
-                        int riceSubsidy = Integer.parseInt(values[2].trim());
-                        int phoneAllowance = Integer.parseInt(values[3].trim());
-                        int clothingAllowance = Integer.parseInt(values[4].trim());
-                        double hourlyRate = Double.parseDouble(values[5].trim());
-                        String position = values[6].trim();
+                if (values.length >= 7) { // Ensure all required columns are present in the row
+                    String employeeID = values[0].trim(); // Employee ID column
+                    String employeeName = values[1].trim(); // Employee Name column
 
-                        // Store all data in PayCalculator object
+                    try {
+                        int riceSubsidy = Integer.parseInt(values[2].trim()); // Parse rice subsidy allowance
+                        int phoneAllowance = Integer.parseInt(values[3].trim()); // Parse phone allowance
+                        int clothingAllowance = Integer.parseInt(values[4].trim()); // Parse clothing allowance
+                        double hourlyRate = Double.parseDouble(values[5].trim()); // Parse hourly rate
+                        String position = values[6].trim(); // Parse position
+
                         PayCalculator empInfo = new PayCalculator(riceSubsidy, phoneAllowance, clothingAllowance, hourlyRate);
-                        empInfo.setName(employeeName);
-                        empInfo.setPosition(position);
-                        employeeMapRates.put(employeeID, empInfo);
+                        empInfo.setName(employeeName); // Set employee name
+                        empInfo.setPosition(position); // Set employee position
+
+                        employeeMapRates.put(employeeID, empInfo); // Add employee data to HashMap
                     } catch (NumberFormatException e) {
-                        System.err.println("Error parsing number in row: " + line);
-                        continue; // Skip to the next row
+                        System.err.println("Error parsing number in row: " + line); // Error message for invalid numeric data
+                        continue; // Skip to the next row in case of error
                     }
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error reading the CSV file: " + e.getMessage());
+            System.err.println("Error reading the CSV file: " + e.getMessage()); // Error message for file reading issues
         }
     }
-        private static double calculateWithholdingTax(double taxableIncome) {
+    //calculate withholding tax
+     private static double calculateWithholdingTax(double taxableIncome) {
         if (taxableIncome <= 20832) {
             return 0;
         } else if (taxableIncome <= 33333) {
@@ -143,16 +151,19 @@ public class PayCalculator {
             return 200833.33 + (taxableIncome - 666667) * 0.35;
         }
     }
-  private static double calculatePagibig(double grossPay) {
+    //calculate Pagibig Contribution
+     private static double calculatePagibig(double grossPay) {
         double rate = (grossPay > 1500) ? 0.02 : 0.01;
         return Math.min(grossPay * rate, 100); // Maximum of 100
     }
- private static double calculatePhilhealth(double grossPay) {
+    //calculate philhealth contribution
+     private static double calculatePhilhealth(double grossPay) {
         double rate = 0.03;
         double contribution = grossPay * rate;
         return Math.min(contribution / 2, 900); // Employee pays half, max of 900
     }
- private static double calculateSSS(double grossPay) {
+    //calculate SSS contribution
+     private static double calculateSSS(double grossPay) {
         if (grossPay < 3250) {
             return 135.0;
         } else if (grossPay <= 3749.99) {
@@ -246,7 +257,9 @@ public class PayCalculator {
         }
     }
 
-    // Compute and display payroll details
+    /**
+     * Computes payroll details for an employee within a specified cutoff period.
+     */
     private static void computeAndDisplayPayroll(String employeeID, LocalDate startDate, LocalDate endDate) {
         String csvFilePath = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\MotorPHPayslip.csv";
    
@@ -287,7 +300,6 @@ public class PayCalculator {
                     LocalTime scheduledTimeIn = LocalTime.parse("08:00", timeFormatter); // Assuming 08:00 AM is the scheduled time-in
                     LocalTime timeIn = LocalTime.parse(data[4].trim(), timeFormatter);
                     LocalTime timeOut = LocalTime.parse(data[5].trim(), timeFormatter);
-
                     Duration workDuration = Duration.between(timeIn, timeOut);
                     double dailyWorkedHours = workDuration.toMinutes() / 60.0;
 
@@ -324,7 +336,10 @@ public class PayCalculator {
         double pagibigDeduction = isFirstCutoff ? calculatePagibig(grossPay) : 0;
 
         double taxableIncome = grossPay - (sssDeduction + philhealthDeduction + pagibigDeduction);
-        double withholdingTax = calculateWithholdingTax(taxableIncome);
+        double totalWithholdingTax = calculateWithholdingTax(taxableIncome);
+         // Dividing withholding tax into two cutoffs
+        double withholdingTaxPerCutoff = totalWithholdingTax / 2;
+        double withholdingTax = withholdingTaxPerCutoff;
         double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
         double netPay = grossPay - totalDeductions;
 
@@ -382,23 +397,46 @@ System.out.println(payslip);
     List<String> csvData = Arrays.asList(
         employeeID, employeeName, position,
         startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " + endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-        String.valueOf(totalWorkedHours), String.valueOf(totalTardinessHours), String.valueOf(-tardinessDeduction), String.valueOf(daysLate),
-        String.valueOf(hourlyRate), String.valueOf(regularPay), String.valueOf(overtimePay),
-        String.valueOf(riceSubsidy), String.valueOf(phoneAllowance), String.valueOf(clothingAllowance), String.valueOf(totalAllowances),
-        String.valueOf(grossPay), String.valueOf(sssDeduction), String.valueOf(philhealthDeduction), String.valueOf(pagibigDeduction), String.valueOf(withholdingTax),
-        String.valueOf(totalDeductions), String.valueOf(netPay)
+        String.valueOf(totalWorkedHours),
+        String.valueOf(totalTardinessHours),
+        String.valueOf(-tardinessDeduction),
+        String.valueOf(daysLate),
+        String.valueOf(hourlyRate),
+        String.valueOf(regularPay),
+        String.valueOf(overtimePay),
+        String.valueOf(riceSubsidy),
+        String.valueOf(phoneAllowance),
+        String.valueOf(clothingAllowance),
+        String.valueOf(totalAllowances),
+        String.valueOf(grossPay),
+        String.valueOf(sssDeduction),
+        String.valueOf(philhealthDeduction),
+        String.valueOf(pagibigDeduction),
+        String.valueOf(withholdingTax),
+        String.valueOf(totalDeductions),
+        String.valueOf(netPay)
     );
 
-        String csvFilePathLocal = "C:\\Users\\Jomax\\OneDrive\\Documents\\NetBeansProjects\\CompProg1\\CompProgtest2\\CP1Test\\MO-IT101-Group1\\src\\payroll\\hub\\MotorPHPayslip.csv";
-
-    // Write to CSV file
+    // Write the payroll details to a CSV file
     try {
-        Files.write(
-            Paths.get(csvFilePathLocal),
-            (String.join(",", csvData) + System.lineSeparator()).getBytes(),
-            StandardOpenOption.CREATE, StandardOpenOption.APPEND
-        );
-        System.out.println("Payroll data saved to " + csvFilePathLocal);
+        Path csvPath = Paths.get(csvFilePath);
+        
+        // Check if the file exists; if not, create it and write the header row
+        if (!Files.exists(csvPath)) {
+            List<String> header = Arrays.asList(
+                "Employee ID", "Employee Name", "Position", "Cut-off Period",
+                "Total Worked Hours", "Tardiness (Hours)", "Tardiness Deduction",
+                "Days Late", "Hourly Rate", "Regular Pay", "Overtime Pay",
+                "Rice Subsidy", "Phone Allowance", "Clothing Allowance",
+                "Total Allowances", "Gross Pay", "SSS Deduction",
+                "PhilHealth Deduction", "Pag-IBIG Deduction",
+                "Withholding Tax", "Total Deductions", "Net Pay"
+            );
+            Files.write(csvPath, Collections.singleton(String.join(",", header)), StandardOpenOption.CREATE);
+        }
+
+        // Append the employee's payroll details to the CSV file
+        Files.write(csvPath, Collections.singleton(String.join(",", csvData)), StandardOpenOption.APPEND);
     } catch (IOException e) {
         System.err.println("Error writing to CSV file: " + e.getMessage());
     }
